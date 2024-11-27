@@ -1,0 +1,55 @@
+<!-- User Details -->
+<div class="sidebar-header text-center">
+    <div class="border-2 rounded-full w-28 h-28 mx-auto">
+        <div class="w-28 h-28 rounded-full bg-gray-500 flex justify-center items-center text-white text-2xl font-bold" id="letter">
+            <%= user.name %>
+        </div>
+    </div>
+    <h1 class="mt-2 text-gray-700 font-semibold text-md">
+        <% if (user.role == "admin") { %>
+            Admin
+        <% } else { %>
+            Kullanıcı
+        <% } %>
+    </h1>
+    <p class="text-gray-700 font-semibold text-md"><%= user.name %></p>
+</div>
+<ul>
+    <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/settings'">
+        <span class="text-gray-700 font-semibold text-md">Ayarlar</span>
+        <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+    </li>
+    <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/market'">
+        <span class="text-gray-700 font-semibold text-md">Sepet</span>
+        <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+    </li>
+
+    <% if (user.role =="admin") { %>
+        <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/users'">
+            <span class="text-gray-700 font-semibold text-md">Kullanıcılar</span>
+            <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+        </li>
+        <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/categories'">
+            <span class="text-gray-700 font-semibold text-md">Kategoriler</span>
+            <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+        </li>
+        <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/products'">
+            <span class="text-gray-700 font-semibold text-md">Ürünler</span>
+            <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+        </li>
+        <li class="py-4 px-2 flex justify-between items-center hover:bg-gray-100 transition duration-200 cursor-pointer group" onclick="location.href='/auth/orders'">
+            <span class="text-gray-700 font-semibold text-md">Siparişler</span>
+            <i class="group-hover:mr-2 fa-solid fa-angle-right transition duration-500"></i>
+        </li>
+    <% } %>
+</ul>
+
+<script>
+    const letterElement = document.getElementById("letter");
+    
+    // Kullanıcı adını ilk harflerine kısaltma
+    const shorterLetter = letterElement.outerText.split(" ").map(word => word.charAt(0)).join("");
+    
+    // Kısaltılmış harfleri içeriğe yazma
+    letterElement.innerText = shorterLetter.toUpperCase(); // Büyük harf yapmak isterseniz
+</script>

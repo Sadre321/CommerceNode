@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <style>
+        /* Özel stil ayarlamaları */
+        .sidebar-header {
+            border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
+            padding-bottom: 1rem; /* Alt boşluk */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Kenarları birleştir */
+        }
+        th, td {
+            text-align: left; /* Soldan hizalama */
+            padding: 12px; /* Boşluk */
+        }
+        th {
+            background-color: #f2f2f2; /* Başlık arka plan rengi */
+        }
+        .hover\:bg-gray-100:hover {
+            background-color: #f7fafc; /* Hover efekti */
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <!-- Container -->
+    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8">
+        <!-- Left Container -->
+        <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
+            <%- include('partials/userPanel') %>
+        </div>
+
+        <!-- Right Container -->
+        <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-hidden">
+            <div class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative">
+                <div>
+                    <h1 class="text-gray-700 font-semibold text-md mb-4">Ürün Bilgileri</h1>
+                    <div class="px-2">
+                        <form action="http://localhost:3000/auth/products" method="post" enctype="multipart/form-data" id="myForm">
+                            <div class="mb-2">
+                                <p class="ml-2 font-medium text-sm text-gray-700">Ürün Resimleri</p>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                            </svg>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Yüklemek için tıkla</span> ya da sürükle bırak</p>
+                                            <p class="text-xs text-gray-500">SVG, PNG, JPG veya GIF (MAX. 800x400px)</p>
+                                        </div>
+                                        <input id="dropzone-file" type="file" name="file" class="hidden" multiple />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <p class="ml-2 font-medium text-sm text-gray-700">Ürün Başlığı</p>
+                                <input type="text" name="name" placeholder="Ürün Başlığı" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]" />
+                            </div>
+
+                            <div class="mb-2">
+                                <p class="ml-2 font-medium text-sm text-gray-700">Ürün Açıklaması</p>
+                                <textarea name="description" id="description" placeholder="Ürün Açıklaması" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]"></textarea>
+                            </div>
+
+                            <div class="mb-2">
+                                <p class="ml-2 font-medium text-sm text-gray-700">Kategori</p>
+                                <select name="category" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]">
+                                    <option value="" disabled selected>Kategori Seçin</option>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category._id %>"><%= category.name %></option>
+                                    <% }) %>                      
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <p class="ml-2 font-medium text-sm text-gray-700">Fiyat</p>
+                                <input type="number" name="price" placeholder="Fiyat" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]" />
+                            </div>
+
+                            <div class="flex gap-10 mb-2">
+                                <div class="mb-2">
+                                    <p class="ml-2 font-medium text-sm text-gray-700">Renk</p>
+                                    <div class="flex flex-col">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="color" value="red" class="mr-2" /> Kırmızı
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="color" value="blue" class="mr-2" /> Mavi
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="color" value="green" class="mr-2" /> Yeşil
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="color" value="black" class="mr-2" /> Siyah
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="color" value="white" class="mr-2" /> Beyaz
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <p class="ml-2 font-medium text-sm text-gray-700">Boyut</p>
+                                    <div class="flex flex-col">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="size" value="s" class="mr-2" /> S
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="size" value="m" class="mr-2" /> M
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="size" value="l" class="mr-2" /> L
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="size" value="xl" class="mr-2" /> XL
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="size" value="xxl" class="mr-2" /> XXL
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="px-6 py-2 border border-[#f84525] text-[#f84525] rounded-md hover:text-white hover:bg-[#f84525] duration-500 mb-4">Ekle</button>
+                        </form>
+                        <hr>
+
+                        <div id="productList" class="flex flex-col gap-4">
+                            <% if (products) { %>
+                                <% products.forEach(element => { %>
+                                    <div class="p-2 relative bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg w-auto gap-4 flex">
+                                        <div>
+                                            <img src="<%= element.images[0] %>" class="rounded-lg w-20" />
+                                        </div>
+                                        <div>
+                                            <h1><%= element.name %></h1>
+                                            <p class="font-medium text-sm text-gray-700"><%= element.description.split('. ')[0] + '.' %></p>
+                                            <span class="font-bold text-lg" id="productPrice" data-price="<%= element.price %>"></span>
+                                            <form action="http://localhost:3000/auth/products/<%= element._id %>" method="post" class="absolute -top-3 -left-3">
+                                                <button type="submit" class="border fa-solid fa-x  rounded-full border-[#f84525] bg-white p-2">
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="/js/currency.js"></script>
+    <script>
+        document.querySelectorAll('.delete-product').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const productId = e.target.dataset.id; // Ürün ID'sini al
+
+                if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
+                    try {
+                        const response = await fetch(`http://localhost:3000/auth/products/${productId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            location.reload(); // Ürünü başarıyla sildiyseniz, sayfayı yenileyin
+                        } else {
+                            console.error('Silme işlemi başarısız oldu');
+                        }
+                    } catch (err) {
+                        console.error('Hata:', err);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

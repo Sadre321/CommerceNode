@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <style>
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-item {
+            min-width: 100%;
+        }
+
+        /* Ek stil düzenlemeleri */
+        .image-container {
+            border: 2px solid black;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .thumbnail {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .color-box {
+            height: 24px; /* Renk kutularının yüksekliği */
+            width: 40px;  /* Renk kutularının genişliği */
+            border-radius: 4px; /* Yuvarlak köşe */
+        }
+
+        /* Zoom alanı */
+        #zoomArea {
+            position: absolute;
+            border: 2px solid black;
+            border-radius: 4px;
+            width: 100px;  /* Zoom alanı boyutu */
+            height: 100px; /* Zoom alanı boyutu */
+            background: rgba(255, 255, 255, 0.7);
+            display: none;  /* Başlangıçta gizli */
+            pointer-events: none; /* Fare olaylarını engelle */
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <!-- Container -->
+    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-center gap-8">
+        
+        <!-- Image Container -->
+        <div class="p-2 overflow-auto flex gap-4">
+            <!-- Thumbnail Images -->
+            <div class="flex flex-col gap-2">
+                <% product.images.forEach(item => { %>
+                    <div class="image-container p-1">
+                        <img src="<%= item %>" class="w-20 thumbnail" id="sectionImg">
+                    </div>
+                <% }); %>
+            </div>
+
+            <!-- Main Image -->
+            <div class="overflow-hidden">
+                <img src="<%= product.images[0] %>" class="h-[555px] relative rounded-lg shadow-md" id="imgArea">
+            </div>
+        </div>
+
+        <!-- Product Details Container -->
+        <div class="p-4 overflow-auto bg-white flex flex-col gap-2 shadow-lg rounded-lg w-1/3 h-[555px]">
+            <% if (user.favorites.includes(product._id)) { %>
+                <form action="/auth/removeFavorite" method="post">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-xl font-bold"><%= product.name %></h1>
+                        <input type="hidden" name="productId" value="<%= product._id %>">
+                        <button aria-label="Add to favorites" id="addFavorite">
+                            <i
+                            class="border rounded-full border-[#f84525] bg-white p-2 fa-solid text-[#f84525] fa-heart cursor-pointer"
+                          ></i>
+                        </button>
+                    </div>
+                </form>
+            <% } else { %>
+             
+                <form action="/auth/addFavorite" method="post">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-xl font-bold"><%= product.name %></h1>
+                        <input type="hidden" name="productId" value="<%= product._id %>">
+                        <button aria-label="Add to favorites" id="addFavorite">
+                            <i
+                            class="border rounded-full border-[#f84525] bg-white p-2 fa-regular text-[#f84525] fa-heart cursor-pointer"
+                          ></i>
+                        </button>
+                    </div>
+                </form>
+
+                <%}%>
+            
+            <div class="flex gap-5 items-center">
+                <div class="text-[#facc15] flex items-center">
+                    <span>4.7</span>
+                    <i class="fa-solid fa-star ml-2"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="font-semibold">
+                    <span>92</span> değerlendirme
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-2xl" id="productPrice" data-price="<%= product.price %>"></span>
+                <button class="py-2 px-4 border-2 text-sm hover:border-black hover:text-black hover:bg-white rounded-lg bg-[#f84525] text-white cursor-pointer duration-300" id="addMarket" data-id="<%= product._id %>">
+                    Sepete Ekle <i class="fa-solid fa-basket-shopping p-1"></i>
+                </button>
+            </div>
+            <hr class="my-2">
+            <div>
+                <p class="font-semibold">Renk: <span class="font-normal" id="selectedColor"><%= product.colors[0].toUpperCase() %></span></p>
+                <div class="flex gap-2">
+                    <% product.colors.forEach(color => { %>
+                        <div class="color-box border text-center flex items-center justify-center rounded-lg cursor-pointer hover:bg-gray-200 transition duration-200" 
+                             style="background-color: <%= color %>;" 
+                             title="<%= color.charAt(0).toUpperCase() + color.slice(1) %>" 
+                             onclick="selectColor('<%= color.charAt(0).toUpperCase() + color.slice(1) %>')">
+                        </div>
+                    <% }) %>
+                    
+                </div>
+            </div>
+            
+            <div>
+                <p class="font-semibold">Beden: <span class="font-normal" id="selectedSize"><%= product.sizes[0].toUpperCase() %></span></p>
+                <div class="flex gap-2">
+                    <% product.sizes.forEach(size => { %>
+                        <div class="color-box border text-center flex items-center justify-center rounded-lg cursor-pointer hover:bg-gray-200 transition duration-200" onclick="selectSize('<%= size.toUpperCase() %>')"><%= size.toUpperCase() %></div>
+                    <% }) %>
+                </div>
+            </div>
+            
+            <hr class="my-2">
+            <!-- Products details -->
+            <div class="p-2 h-[450px] overflow-auto">
+                <h1 class="font-semibold text-2xl">Ürün Hakkında</h1>
+                <p>
+                    <%= product.description %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <!-- image-js -->
+    <script src="/js/image.js"></script>
+    <script src="/js/currency.js"></script>
+    <script>
+        let selectedColor = document.getElementById("selectedColor").innerText; 
+        let selectedSize = document.getElementById("selectedSize").innerText;
+    
+        const selectColor = (color) => {
+            selectedColor = color;
+            document.getElementById("selectedColor").innerText = color; // Renk metnini güncelle
+        }
+    
+        const selectSize = (size) => {
+            selectedSize = size;
+            document.getElementById("selectedSize").innerText = size; // Beden metnini güncelle
+        }
+    
+        document.getElementById("addMarket").addEventListener("click", async (e) => {
+            const productId = e.target.getAttribute("data-id");
+    
+            const data = {
+                id: productId,
+                color: selectedColor.toUpperCase(),
+                size: selectedSize.toUpperCase(),
+                quantity: 1 // Varsayılan olarak 1 adet
+            };
+    
+            try {
+                const response = await fetch("http://localhost:3000/auth/addCart", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json' // JSON formatında gönderim yap
+                    },
+                    body: JSON.stringify(data)
+                });
+    
+                const result = await response.json();
+
+                if (result.code = 201) {
+                    // Butonu değiştir
+    const button = document.getElementById("addMarket");
+    button.innerHTML = `<button class="py-2 px-4 border-2 text-sm rounded-lg bg-green-500 text-white cursor-pointer duration-300">
+        Eklendi! <i class="fa-solid fa-check p-1"></i>
+    </button>`;
+
+    // 5 saniye bekle ve butonu eski haline döndür
+    setTimeout(() => {
+        button.innerHTML = `<button class="py-2 px-4 border-2 text-sm hover:border-black hover:text-black hover:bg-white rounded-lg bg-[#f84525] text-white cursor-pointer duration-300" id="addMarket" data-id="<%= product._id %>">
+                    Sepete Ekle <i class="fa-solid fa-basket-shopping p-1"></i>
+                </button>`;
+    }, 3000); // 5000 ms = 5 saniye
+                } else {
+                    alert("Sepete eklenirken bir hata oluştu." + result.code);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Bir hata oluştu.");
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <style>
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .carousel-item {
+            min-width: 100%;
+        }
+
+        .product-card {
+            width: 48%; /* Kartın genişliğini artırdık */
+            max-width: 300px; /* Maksimum genişlik */
+        }
+        
+        .thumbnail {
+            display: none; /* Yüklenirken gizle */
+        }
+        
+        .thumbnail.loaded {
+            display: block; /* Yüklendiğinde göster */
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <!-- container -->
+    <div class="w-full flex h-[673px] overflow-hidden">
+        <!-- left container -->
+        <div class="w-1/6 p-2 overflow-auto">
+            <!-- category list -->
+            <div class="mb-4">
+                <h1 class="text-gray-700 font-semibold text-lg mb-4"><a href="?category">Tüm Kategoriler</a></h1>
+                <div class="h-[152px] overflow-y-auto px-2">
+                    <ul class="list-disc list-inside space-y-2">
+                        <% if (categories) { %>
+                            <% categories.forEach(category => { %>
+                                <li class="text-gray-600 hover:text-[#f84525] transition duration-200 cursor-pointer"><a href="?category=<%= category.slug %>"><%= category.name %></a></li>
+                            <% }) %>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- price filter -->
+            <div class="mb-4">
+                <h1 class="text-gray-700 font-semibold text-lg mb-4">Fiyat Aralığı</h1>
+                <div class="flex px-2 items-center gap-4">
+                    <input type="number" class="border border-[#f84525] px-3 py-2 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-[#f84525] focus:border-transparent" id="minPrice" placeholder="En Az" oninput="FilterProduct()">
+                    <span class="text-gray-700">-</span>
+                    <input type="number" class="border border-[#f84525] px-3 py-2 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-[#f84525] focus:border-transparent" id="maxPrice" placeholder="En Çok" oninput="FilterProduct()">
+                </div>
+            </div>
+
+            <!-- color filter -->
+            <div class="mb-4">
+              <h1 class="text-gray-700 font-semibold text-lg mb-4">Renk</h1>
+              <ul class="px-2 space-y-2">
+                  <% const colors = ['blue', 'red', 'green', 'black']; %>
+                  <% colors.forEach(color => { %>
+                    <li class="colors flex items-center gap-2">
+                      <div class="w-6 h-6 border border-[#f84525] rounded-full flex items-center justify-center">
+                          <div class="w-4 h-4 rounded-full cursor-pointer" style="background-color: <%= color.toLowerCase() %>;" data-color="<%= color %>"></div>
+                      </div>
+                      <span class="text-gray-600"> - <%= color %></span>
+                  </li>
+                  <% }); %>
+              </ul>
+          </div>
+
+            <!-- size filter -->
+            <div class="mb-4">
+                <h1 class="text-gray-700 font-semibold text-lg mb-4">Boyut</h1>
+                <ul class="px-2 space-y-2">
+                    <% const sizes = ['S', 'M', 'L', 'XL']; %>
+                    <% sizes.forEach(size => { %>
+                        <li class="sizes flex items-center gap-2">
+                            <div class="w-6 h-6 border border-[#f84525] rounded-full flex items-center justify-center cursor-pointer" data-size="<%= size %>"><%= size %></div>
+                            <span class="text-gray-600"> - <%= size === 'M' ? 'Medium' : size %></span>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+
+        <!-- right container -->
+        <div class="w-5/6 mx-auto p-2 bg-[#f8f4f3] overflow-auto" id="productList">
+            <!-- products -->
+            <div class="flex flex-wrap gap-8 w-full mb-4">
+              <% if (products) { %>
+                <% products.forEach(product => { %>
+                    <a href="/products/<%= product.slug %>" class="p-4 bg-white border shadow-md text-[#f84525] border-[#f84525] rounded-lg product-card flex flex-col gap-4" data-price="<%= product.price %>" data-colors="<%= product.colors.join(',') %>" data-sizes="<%= product.sizes.join(',') %>">
+                        <div>
+                            <img src="<%= product.images[0] %>" class="rounded-lg w-full h-48 object-cover thumbnail" onload="this.classList.add('loaded');">
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-semibold mb-1"><%= product.name %></h1>
+                            <p class="font-medium text-sm text-gray-700 mb-2"><%= product.description.split('. ')[0] + '.' %></p>
+                            <span class="font-bold text-lg"><%= product.price.toFixed(2) %> ₺</span>
+                        </div>
+                        <!-- Sizes Bölümü -->
+                        <div class="mt-2">
+                            <h2 class="font-semibold text-sm">Bedenler:</h2>
+                            <div class="flex gap-2">
+                                <% product.sizes.forEach(size => { %>
+                                    <span class="border border-gray-300 rounded-lg px-2 py-1 text-sm">
+                                        <%= size.toUpperCase() %>
+                                    </span>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <!-- Colors Bölümü -->
+                        <div class="mt-2">
+                            <h2 class="font-semibold text-sm">Renkler:</h2>
+                            <div class="flex gap-2">
+                                <% product.colors.forEach(color => { %>
+                                    <div class="color-box border rounded-full w-6 h-6" style="background-color: <%= color %>;" title="<%= color.charAt(0).toUpperCase() + color.slice(1) %>"></div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+              <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="/js/currency.js"></script>
+
+    <script> 
+      const selectedColors = [];
+      const selectedSizes = [];
+
+      function FilterProduct() {
+    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+
+    const productCards = document.querySelectorAll(".product-card");
+
+    productCards.forEach(card => {
+        const price = parseFloat(card.dataset.price);
+        const colors = card.dataset.colors.split(',');
+        const sizes = card.dataset.sizes.split(',');
+
+        // Renk ve boyut eşleşmelerini kontrol et
+        const colorMatch = selectedColors.length === 0 || selectedColors.some(color => colors.includes(color));
+        const sizeMatch = selectedSizes.length === 0 || selectedSizes.some(size => sizes.includes(size));
+        const priceMatch = price >= minPrice && price <= maxPrice;
+
+        // Ürün, tüm koşulları sağlıyorsa göster
+        if (colorMatch && sizeMatch && priceMatch) {
+            card.style.display = 'flex'; // Ürünü göster
+        } else {
+            card.style.display = 'none'; // Ürünü gizle
+        }
+    });
+}
+
+      document.querySelectorAll(".colors .w-4").forEach(color => {
+          color.addEventListener("click", function(e) {
+              const colorValue = this.dataset.color; // data-color değerini alıyoruz.
+              
+              if (!selectedColors.includes(colorValue)) {
+                  selectedColors.push(colorValue); // Eğer renk yoksa ekliyoruz.
+              } else {
+                  const index = selectedColors.indexOf(colorValue);
+                  if (index > -1) {
+                      selectedColors.splice(index, 1); // Rengi diziden çıkarıyoruz.
+                  }
+              }
+              
+              console.log(selectedColors); // Güncellenmiş rengi konsola yazdırıyoruz.
+              FilterProduct(); // Filtreleme işlemini çağırıyoruz.
+          });
+      });
+
+      document.querySelectorAll(".sizes .w-6").forEach(size => {
+          size.addEventListener("click", function(e) {
+              const sizeValue = this.dataset.size; // data-size değerini alıyoruz.
+              
+              if (!selectedSizes.includes(sizeValue)) {
+                  selectedSizes.push(sizeValue); // Eğer beden yoksa ekliyoruz.
+              } else {
+                  const index = selectedSizes.indexOf(sizeValue);
+                  if (index > -1) {
+                      selectedSizes.splice(index, 1); // Bedeni diziden çıkarıyoruz.
+                  }
+              }
+              
+              console.log(selectedSizes); // Güncellenmiş bedeni konsola yazdırıyoruz.
+              FilterProduct(); // Filtreleme işlemini çağırıyoruz.
+          });
+      });
+    </script>
+</body>
+</html>

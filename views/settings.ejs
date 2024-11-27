@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('partials/head') %>
+    <style>
+      /* Özel stil ayarlamaları */
+      .sidebar-header {
+        border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
+        padding-bottom: 1rem; /* Alt boşluk */
+      }
+      .modal {
+        transform: translateY(-100%);
+        transition: transform 0.3s ease-in-out;
+      }
+      .modal.show {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/navbar') %>
+
+    <!-- Container -->
+    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8">
+      <!-- Left Container -->
+      <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
+        <%- include('partials/userPanel') %>
+      </div>
+
+      <!-- Right Container -->
+      <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-hidden">
+        <div class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative">
+          <div>
+            <h1 class="text-gray-700 font-semibold text-md mb-4">Kişisel bilgiler</h1>
+            <div class="px-2">
+              <form action="/auth/save" method="post">
+                <input type="hidden" name="_method" value="put"> <!-- PUT metodunu belirt -->
+                <div class="mb-2">
+                    <p class="ml-2 font-medium text-sm text-gray-700">E-posta Adresi</p>
+                    <input type="email" name="email" placeholder="Email" value="<%= user.email %>" disabled class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525] cursor-not-allowed" />
+                </div>
+                <div class="mb-2">
+                    <p class="ml-2 font-medium text-sm text-gray-700">Kullanıcı Adı</p>
+                    <input type="text" name="username" placeholder="Kullanıcı Adı" value="<%= user.username %>" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]" required />
+                </div>
+                <div class="mb-2">
+                    <p class="ml-2 font-medium text-sm text-gray-700">Şifre</p>
+                    <input type="password" name="password" placeholder="Şifre" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]" />
+                </div>
+                <button type="submit" class="p-2 bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg">Kaydet</button>
+            </form>
+            
+
+              <form id="adressForm">
+                <div class="mb-4">
+                  <p class="ml-2 font-medium text-sm text-gray-700">Adresler</p>
+                  <div class="flex flex-wrap gap-4">
+                    <button class="p-2 bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg w-48 h-32" type="button" onclick="openModal()">+</button>
+                    <% if (addresses) { %>
+                      <div class="flex flex-wrap gap-4 address-container">
+                        <% addresses.forEach(adress => { %>
+                          <div class="p-2 bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg w-48 h-32 relative">
+                            <p><%= adress.adress %></p>
+                            <h1 class="font-medium text-sm text-gray-700"><%= adress.title %></h1>
+                            <div class="absolute -top-2 -left-2 cursor-pointer p-1 border rounded-full flex justify-center items-center border-[#f84525] bg-white w-6 h-6" data-id="<%= adress._id %>" id="deleteAdress">x</div>
+                          </div>
+                        <% }) %>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+                <!-- Add Address Modal -->
+                <div id="addAddressModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 hidden">
+                  <div class="bg-white rounded-lg p-6 w-1/3 modal">
+                    <h2 class="text-gray-700 font-semibold text-lg mb-4">Yeni Adres Ekle</h2>
+                    <form>
+                      <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700" for="address">Adres</label>
+                        <input type="text" name="address" id="address" placeholder="Adresinizi girin" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]" required />
+                      </div>
+                      <div class="mb-4">
+                        <label class="block font-medium text-sm text-gray-700" for="addressType">Adres Türü</label>
+                        <select name="addressType" id="addressType" class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]">
+                          <option value="ev">Ev</option>
+                          <option value="iş">İş</option>
+                          <option value="diğer">Diğer</option>
+                        </select>
+                      </div>
+                      <div class="flex justify-end">
+                        <button type="button" id="closeModal" class="mr-2 p-2 bg-gray-200 rounded-lg" onclick="closeModal()">İptal</button>
+                        <button type="submit" class="p-2 bg-[#f84525] text-white rounded-lg">Ekle</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Favorites -->
+          <div>
+            <h1 class="text-gray-700 font-semibold text-md mb-4">Favoriler</h1>
+            <div class="flex flex-wrap gap-4">
+              <% if (favorites) { %>
+                <% favorites.forEach(favori => { %>
+                  <form action="/auth/removeFavorite" method="post">
+                    <div class="p-2 relative bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg w-auto gap-4 flex">
+                      <input type="hidden" name="productId" value="<%= favori._id %>">
+                      <div>
+                        <img src="<%= favori.images[0] %>" class="rounded-lg w-20" />
+                      </div>
+                      <div>
+                        <h1><%= favori.name %></h1>
+                        <p class="font-medium text-sm text-gray-700"><%= favori.description.split('. ')[0] + '.' %></p>
+                        <span class="font-bold text-lg" data-price="<%= favori.price %>" id="productPrice"></span>
+                        <button type="submit" class="fa-solid fa-heart absolute -top-3 border rounded-full border-[#f84525] bg-white -left-3 p-2"></button>
+                      </div>
+                    </div>
+                  </form>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+
+          <% if (user.role != "admin") { %>
+            <div>
+              <h1 class="text-gray-700 font-semibold text-md mb-4">Hesabı Sil</h1>
+              <div>
+                <button class="p-2 flex justify-center items-center bg-white border shadow text-red-700 border-red-700 rounded-lg w-24 h-8 hover:border-none hover:bg-red-700 hover:text-white duration-500" id="deleteUser" data-user="<%= user._id %>">
+                  Sil
+                </button>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <!-- Modals -->
+    <script src="/js/modals.js"></script>
+    <!-- Address -->
+    <script src="/js/address.js"></script>
+    <!-- Currency -->
+    <script src="/js/currency.js"></script>
+
+    <script> 
+      document.getElementById("deleteUser").addEventListener("click", async (e) => {
+        const id = e.target.getAttribute("data-user");
+        if (confirm("Hesabınızı silmek istediğinize emin misiniz?")) {
+          try {
+            const response = await fetch("/auth/deleteUser", {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ id }) // Kullanıcı ID'sini nesne olarak ekledik
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              alert(result.message); // Başarı mesajı göster
+              window.location.href = "/auth/login"; // Silme işleminden sonra ana sayfaya yönlendir
+            } else {
+              const errorResult = await response.json();
+              alert(errorResult.message); // Hata mesajı göster
+            }
+          } catch (error) {
+            console.error("Bir hata yaşandı:", error);
+            alert("Bir hata oluştu, lütfen tekrar deneyin.");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <style>
+        /* Özel stil ayarlamaları */
+        .sidebar-header {
+            border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
+            padding-bottom: 1rem; /* Alt boşluk */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Kenarları birleştir */
+        }
+        th, td {
+            text-align: left; /* Soldan hizalama */
+            padding: 12px; /* Boşluk */
+        }
+        th {
+            background-color: #f2f2f2; /* Başlık arka plan rengi */
+        }
+        .hover\:bg-gray-100:hover {
+            background-color: #f7fafc; /* Hover efekti */
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+
+    <!-- Container -->
+    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8">
+        <!-- Left Container -->
+        <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
+            <%- include('partials/userPanel') %>
+        </div>
+
+        <!-- Right Container -->
+        <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-hidden">
+            <div class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative">
+                <div>
+                    <h1 class="text-gray-700 font-semibold text-md mb-4">Kategoriler</h1>
+                    <form id="addCategoryForm" class="mb-4">
+                        <div class="mb-2">
+                            <p class="ml-2 font-medium text-sm text-gray-700">Kategori</p>
+                            <div class="flex gap-2">
+                                <input
+                                    type="text"
+                                    id="categoryName"
+                                    name="kategori"
+                                    placeholder="Kategori Adı"
+                                    class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    class="p-2 w-12 h-12 border border-[#f84525] text-[#f84525] rounded-md hover:text-white hover:bg-[#f84525] duration-500"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-300">
+                            <thead>
+                                <tr class="w-full bg-gray-200 text-gray-700">
+                                    <th class="border-b">Kategori Adı</th>
+                                    <th class="border-b">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTableBody">
+                                <% if (categories) { %>
+                                    <% categories.forEach(element => { %>
+                                        <tr class="hover:bg-gray-100" data-id="<%= element._id %>">
+                                            <td class="border-b"><%= element.name %></td>
+                                            <td class="border-b">
+                                                <button class="text-blue-500 hover:text-blue-700 editCategory">Düzenle</button>
+                                                <button class="text-red-500 hover:text-red-700 ml-2 deleteCategory" data-id="<%= element._id %>">Sil</button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script>
+    document.getElementById("addCategoryForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const categoryData = {
+            kategori: document.getElementById("categoryName").value,
+        };
+
+        try {
+            const response = await fetch("http://localhost:3000/auth/categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(categoryData),
+            });
+
+            if (response.ok) {
+                const category = await response.json();
+                const {_id, name} = category.newCategory;
+
+                // Yeni kategoriyi tabloya ekleyin
+                const categoryTableBody = document.getElementById("categoryTableBody");
+                const categoryRow = `
+                    <tr class="hover:bg-gray-100" data-id="${_id}">
+                        <td class="border-b">${name}</td>
+                        <td class="border-b">
+                            <button class="text-blue-500 hover:text-blue-700 editCategory">Düzenle</button>
+                            <button class="text-red-500 hover:text-red-700 ml-2 deleteCategory" data-id="${_id}">Sil</button>
+                        </td>
+                    </tr>`;
+                categoryTableBody.innerHTML += categoryRow; // Yeni kategoriyi tabloya ekle
+
+                // Giriş alanını temizle
+                document.getElementById("categoryName").value = "";
+            } else {
+                console.error("Kategori eklenirken bir hata oluştu.");
+            }
+        } catch (error) {
+            console.error("Hata:", error);
+        }
+    });
+
+    document.addEventListener("click", async (e) => {
+        if (e.target.matches(".deleteCategory")) {
+            const categoryId = e.target.dataset.id;
+            const categoryRow = e.target.closest("tr"); // Silinecek satırı bul
+
+            try {
+                const response = await fetch(`http://localhost:3000/auth/categories/${categoryId}`, {
+                    method: "DELETE",
+                });
+
+                if (response.ok) {
+                    console.log("Kategori Silindi");
+                    categoryRow.remove(); // Tablo görünümünden satırı kaldır
+                } else {
+                    console.error("Kategori silinirken bir hata oluştu.");
+                }
+            } catch (error) {
+                console.error("Server hatası:", error);
+            }
+        }
+
+        if (e.target.matches(".editCategory")) {
+            const categoryRow = e.target.closest("tr");
+            const categoryId = categoryRow.dataset.id;
+            const categoryName = categoryRow.children[0].innerText; // Kategori adını al
+
+            // Giriş alanına kategori adını doldur
+            document.getElementById("categoryName").value = categoryName;
+
+            // Formun güncellenmesini sağlamak için formu dinamik hale getir
+            document.getElementById("addCategoryForm").onsubmit = async (e) => {
+                e.preventDefault();
+
+                const updatedCategoryData = {
+                    kategori: document.getElementById("categoryName").value,
+                };
+
+                try {
+                    const response = await fetch(`http://localhost:3000/auth/categories/${categoryId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(updatedCategoryData),
+                    });
+
+                    if (response.ok) {
+                        console.log("Kategori Güncellendi");
+                        categoryRow.children[0].innerText = updatedCategoryData.kategori; // Tablo görünümünü güncelle
+                        document.getElementById("categoryName").value = ""; // Giriş alanını temizle
+                    } else {
+                        console.error("Kategori güncellenirken bir hata oluştu.");
+                    }
+                } catch (error) {
+                    console.error("Hata:", error);
+                }
+            };
+        }
+    });
+    </script>
+</body>
+</html>

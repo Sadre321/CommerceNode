@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('partials/head') %>
+    <style>
+      /* Özel stil ayarlamaları */
+      .sidebar-header {
+            border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
+            padding-bottom: 1rem; /* Alt boşluk */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Kenarları birleştir */
+        }
+        th, td {
+            text-align: left; /* Soldan hizalama */
+            padding: 12px; /* Boşluk */
+        }
+        th {
+            background-color: #f2f2f2; /* Başlık arka plan rengi */
+        }
+        .hover\:bg-gray-100:hover {
+            background-color: #f7fafc; /* Hover efekti */
+        }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/navbar') %>
+
+    <!-- Container -->
+    <div
+      class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8"
+    >
+      <!-- Left Container -->
+      <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
+        <%- include('partials/userPanel') %>
+      </div>
+
+      <!-- Right Container -->
+      <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-hidden">
+        <div
+          class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative"
+        >
+        <div>
+          <h1 class="text-gray-700 font-semibold text-md mb-4">Kullanıcılar</h1>
+          <div class="overflow-x-auto">
+              <table class="min-w-full bg-white border border-gray-300">
+                  <thead>
+                      <tr class="w-full bg-gray-200 text-gray-700">
+                          <th class="border-b">Kategori Adı</th>
+                          <th class="border-b">Sipariş Adedi</th>
+                          <th class="border-b">Kategori Adı</th>
+                          <th class="border-b">İşlem</th>
+                      </tr>
+                  </thead>
+                  <tbody id="categoryTableBody">
+                      <% if (users) { %>
+                          <% users.forEach(element => { %>
+                              <tr class="hover:bg-gray-100">
+                                  <td class="border-b"><%= element.name %></td>
+                                  <td class="border-b">
+                                    <button class="text-blue-500 hover:text-blue-700" id="editCategory">Düzenle</button>
+                                    <button class="text-red-500 hover:text-red-700 ml-2" id="deleteCategory">Sil</button>
+                                </td>      <td class="border-b">
+                                  <button class="text-blue-500 hover:text-blue-700" id="editCategory">Düzenle</button>
+                                  <button class="text-red-500 hover:text-red-700 ml-2" id="deleteCategory">Sil</button>
+                              </td>      <td class="border-b">
+                                <button class="text-blue-500 hover:text-blue-700" id="editCategory">Düzenle</button>
+                                <button class="text-red-500 hover:text-red-700 ml-2" id="deleteCategory">Sil</button>
+                            </td>
+                              </tr>
+                          <% }) %>
+                      <% } %>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+  </body>
+</html>
