@@ -1,65 +1,67 @@
-document
-        .getElementById("adressForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
+document.getElementById("adressForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-          const data = {
-            address: document.getElementById("address").value,
-            addressType: document.getElementById("addressType").value,
-          };
+  const data = {
+    address: document.getElementById("address").value,
+    addressType: document.getElementById("addressType").value,
+  };
 
-          console.log(data);
+  console.log(data);
 
-          try {
-            const response = await fetch("http://localhost:3000/auth/adress", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            });
+  try {
+    const response = await fetch("http://localhost:3000/adress", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-            if (response.ok) {
-              const result = await response.json();
-              await updatedAdresses();
-              closeModal(); // Modalı kapat
-            } else {
-              console.error("Adres eklenirken bir hata oluştu.");
-            }
-          } catch (error) {
-            console.error("Hata:", error);
-          }
-        });
+    if (response.ok) {
+      const result = await response.json();
+      await updatedAdresses();
+      closeModal(); // Modalı kapat
+    } else {
+      console.error("Adres eklenirken bir hata oluştu.");
+    }
+  } catch (error) {
+    console.error("Hata:", error);
+  }
+});
 
-      document.querySelectorAll("#deleteAdress").forEach((deleteBtn) => {
-        deleteBtn.addEventListener("click", async (e) => {
-          const deleteAdress = e.target.dataset.id;
-          try {
-            const response = await fetch(`http://localhost:3000/auth/adress/${deleteAdress}`, {
-              method: "DELETE",
-            });
+document.querySelectorAll("#deleteAdress").forEach((deleteBtn) => {
+  deleteBtn.addEventListener("click", async (e) => {
+    const deleteAdress = e.target.dataset.id;
+    try {
+      const response = await fetch(
+        `http://localhost:3000/adress/${deleteAdress}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-            if(response.ok){
-              console.log("Silme Basarili");
-              await updatedAdresses();
-            }else{
-              console.log("Bir hata yasandi");
-            }
+      if (response.ok) {
+        console.log("Silme Basarili");
+        await updatedAdresses();
+      } else {
+        console.log("Bir hata yasandi");
+      }
+    } catch (err) {
+      console.log("Server Hatasi Yasandi");
+    }
+  });
+});
 
-          } catch (err) {
-            console.log("Server Hatasi Yasandi");
-          }
-        });
-      });
-
-      const updatedAdresses = async () => {
-        const response = await fetch("http://localhost:3000/auth/adress",{method:"GET"});
-        if (response.ok) {
-          const addresses = await response.json();
-          const addressContainer = document.querySelector(".address-container"); // Adreslerin bulunduğu div
-          addressContainer.innerHTML = ""; // Eski adresleri temizle
-          addresses.forEach((adress) => {
-            const adressElement = `
+const updatedAdresses = async () => {
+  const response = await fetch("http://localhost:3000/adress", {
+    method: "GET",
+  });
+  if (response.ok) {
+    const addresses = await response.json();
+    const addressContainer = document.querySelector(".address-container"); // Adreslerin bulunduğu div
+    addressContainer.innerHTML = ""; // Eski adresleri temizle
+    addresses.forEach((adress) => {
+      const adressElement = `
                   <div class="p-2 bg-white border shadow text-[#f84525] border-[#f84525] rounded-lg w-48 h-32 relative">
                       <p>${adress.adress}</p>
                       <h1 class="font-medium text-sm text-gray-700">${adress.title}</h1>
@@ -67,8 +69,7 @@ document
                         data-id="${adress._id}"
                       >x</div>
                   </div>`;
-            addressContainer.innerHTML += adressElement; // Yeni adresleri ekle
-          });
-        }
-      };
-    
+      addressContainer.innerHTML += adressElement; // Yeni adresleri ekle
+    });
+  }
+};

@@ -1,10 +1,11 @@
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
+
 require("dotenv").config(); // .env dosyasını yükle
 require("./data/db"); // Veritabanı bağlantısını kur
 
+const routes = require("./routes/indexRoute")
 const authRoutes = require("./routes/authRoutes");
 const pageRoutes = require("./routes/pageRoutes");
 
@@ -25,10 +26,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Yönlendirme ayarları
 app.use("/auth", authRoutes);
+app.use("/",routes);
 app.use("/", pageRoutes);
 
 // PORT ayarını al ve dinlemeye başla
-const PORT = process.env.PORT || 3000; // 3000 varsayılan port
+const PORT = 3000; // 3000 varsayılan port
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });

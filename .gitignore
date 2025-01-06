@@ -1,0 +1,59 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+.idea/
+*.iml
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# JetBrains IDEs
+.idea/
+
+# Visual Studio
+.vs/
+.vscode/
+
+# Environment variables
+.env
+
+# Log files
+*.log
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Temporary files
+*.swp
+*~
+
+# NPM packages lock files
+package-lock.json
+
+# Build directories
+build/
+dist/

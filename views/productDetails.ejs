@@ -73,6 +73,7 @@
 
         <!-- Product Details Container -->
         <div class="p-4 overflow-auto bg-white flex flex-col gap-2 shadow-lg rounded-lg w-1/3 h-[555px]">
+           <% if (user) { %>
             <% if (user.favorites.includes(product._id)) { %>
                 <form action="/auth/removeFavorite" method="post">
                     <div class="flex items-center justify-between">
@@ -100,6 +101,7 @@
                 </form>
 
                 <%}%>
+           <% } %>
             
             <div class="flex gap-5 items-center">
                 <div class="text-[#facc15] flex items-center">

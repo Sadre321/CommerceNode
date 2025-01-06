@@ -1,87 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <%- include('partials/head') %>
     <style>
-        /* Özel stil ayarlamaları */
-        .sidebar-header {
-            border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
-            padding-bottom: 1rem; /* Alt boşluk */
-        }
+      /* Özel stil ayarlamaları */
+      .sidebar-header {
+        border-bottom: 2px solid #e5e7eb; /* Gri çizgi */
+        padding-bottom: 1rem; /* Alt boşluk */
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('partials/navbar') %>
 
     <!-- Container -->
-    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8">
-        <!-- Left Container -->
-        <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
-            <%- include('partials/userPanel') %>
-        </div>
+    <div
+      class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8"
+    >
+      <!-- Left Container -->
+      <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
+        <%- include('partials/userPanel') %>
+      </div>
 
-        <!-- Right Container -->
-        <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-auto relative">
-            <div class="flex flex-col justify-between h-full shadow-md rounded-lg bg-white p-4">
-                <div>
-                    <h1 class="text-gray-700 font-semibold text-md mb-4">Ürün Listesi</h1>
-                    <div class="overflow-hidden h-[500px]">
-                        <ul class="space-y-4 overflow-auto h-full px-4">
-                            <% orders.orders.forEach(order => { %>
-                                <li class="flex justify-between items-center border-b pb-2">
-                                    <h2 class="font-medium">Sipariş ID: <%= order._id %></h2>
-                                    <span class="font-medium"><%= order.color %></span>
-                                    <span class="font-medium"><%= order.size %></span>
-                                    <span class="font-medium">x<%= order.quantity %></span>
-                                    <span class="font-medium" data-price="<%= order.product.price %>">
-                                        <%= order.product.price %> TL
-                                    </span>
-                                    <button class="border-none text-red-500 hover:text-red-700 deleteBtn" data-id="<%= order._id %>">X</button>
-                                </li>
-                            <% }) %>
-                        </ul>
-                    </div>
-                </div>
-
-                <div>
-                    <hr>
-                    <div class="flex justify-between text-gray-700 font-bold text-lg mb-4">
-                        <div>Toplam Tutar:</div>
-                        <span id="totalPrice"><%= totalPrice.toFixed(2) %></span> <!-- Toplam tutar burada gösterilecek -->
-                    </div>
-                </div>
+      <!-- Right Container -->
+      <div class="w-5/6 h-full p-5 bg-[#f8f4f3] overflow-auto relative">
+        <div
+          class="flex flex-col justify-between overflow-hidden h-full shadow-md rounded-lg bg-white p-4"
+        >
+          <div>
+            <h1 class="text-gray-700 font-semibold text-md mb-4">
+              Ürün Listesi
+            </h1>
+            <div class="overflow-hidden h-[500px]">
+              <ul class="space-y-4 overflow-auto h-full px-4">
+                <% orders.orders.forEach(order => { %>
+                <li class="flex justify-between items-center border-b pb-2">
+                  <h2 class="font-medium"><%= order.product.name %></h2>
+                  <span class="font-medium">x<%= order.quantity %></span>
+                  <span
+                    class="font-medium"
+                    data-price="<%= order.product.price %>"
+                  >
+                    <%= order.product.price %> TL
+                  </span>
+                  <button
+                    class="border-none text-red-500 hover:text-red-700 deleteBtn"
+                    data-id="<%= order._id %>"
+                  >
+                    X
+                  </button>
+                </li>
+                <% }) %>
+              </ul>
             </div>
+          </div>
+
+          <div>
+            <hr />
+            <div class="flex flex-col text-gray-700 font-bold text-lg mb-4">
+              <div class="flex justify-between mb-2">
+                <div>Toplam Tutar:</div>
+                <span id="totalPrice"><%= totalPrice.toFixed(2) %></span>
+                <!-- Toplam tutar burada gösterilecek -->
+              </div>
+              <button
+                class="p-2 text-white rounded-lg bg-[#f84525] hover:opacity-75"
+                id="payment"
+              >
+                Odeme yap
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <%- include('partials/footer') %>
     <script src="/js/currency.js"></script>
+
+    <!-- stripe configure -->
+    <script src="https://js.stripe.com/v3/"></script>
+
     <script>
-        document.querySelectorAll('.deleteBtn').forEach(button => {
-            button.addEventListener("click", async () => {
-                const orderId = button.getAttribute('data-id');
+      document.querySelectorAll(".deleteBtn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const orderId = button.getAttribute("data-id");
 
-                if (confirm('Siparişi silmek istediğinize emin misiniz?')) {
-                    try {
-                        const response = await fetch(`http://localhost:3000/auth/removeCart/${orderId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ orderId: orderId })
-                        });
-
-                        if (response.ok) {
-                            window.location.reload(); // Sipariş başarıyla silindiyse sayfayı yenile
-                        } else {
-                            console.error('Silme işlemi başarısız');
-                        }
-                    } catch (err) {
-                        console.error("Silinirken bir hata ile karşılaşıldı:", err);
-                    }
+          if (confirm("Siparişi silmek istediğinize emin misiniz?")) {
+            try {
+              const response = await fetch(
+                `http://localhost:3000/auth/removeCart/${orderId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ orderId: orderId }),
                 }
-            });
+              );
+
+              if (response.ok) {
+                window.location.reload(); // Sipariş başarıyla silindiyse sayfayı yenile
+              } else {
+                console.error("Silme işlemi başarısız");
+              }
+            } catch (err) {
+              console.error("Silinirken bir hata ile karşılaşıldı:", err);
+            }
+          }
         });
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const stripeKey = "<%= stripeKey %>";
+        try {
+          const stripe = Stripe(stripeKey); // Use Stripe, not loadStripe
+          document
+            .getElementById("payment")
+            .addEventListener("click", async (e) => {
+              e.preventDefault();
+
+              try {
+                const paymentResponse = await fetch(
+                  "http://localhost:3000/auth/payment",
+                  {
+                    method: "POST",
+                  }
+                );
+
+                if (!paymentResponse.ok) {
+                  return message.error("Ödeme işlemi başarısız oldu.");
+                }
+
+                const session = await paymentResponse.json();
+
+                const result = await stripe.redirectToCheckout({
+                  sessionId: session.id,
+                });
+
+                if (result.error) {
+                  throw new Error(result.error.message);
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            });
+        } catch (error) {
+          console.error(error);
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
