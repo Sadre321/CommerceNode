@@ -16,6 +16,7 @@ router.post("/save", authenticationToken, authController.changeUserDetail);
 
 router.get("/market",authenticationToken, pageController.getUserMarketPage);
 router.post("/payment",authenticationToken, cartController.payment);
+router.get("/payment-intents",authenticationToken,checkAdmin,cartController.paymentList)
 
 router.get("/users",authenticationToken,checkAdmin, pageController.getUsersPage);
 

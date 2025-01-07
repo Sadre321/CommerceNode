@@ -170,3 +170,13 @@ exports.getUserMarketPage = async (req, res) => {
     res.status(500).json({ message: "Bir hata oluştu", error: error.message });
   }
 };
+
+exports.successPage = async (req, res) => {
+  const user = res.locals.user;
+  try {
+    res.render("successPage", { page_name: "Success" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Bir hata oluştu", error: error.message });
+  }
+};

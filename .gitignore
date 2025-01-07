@@ -30,6 +30,8 @@ Desktop.ini
 # Linux
 *~
 
+.env
+
 # JetBrains IDEs
 .idea/
 

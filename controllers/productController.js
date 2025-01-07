@@ -1,3 +1,4 @@
+const { Category} = require("../model/categoryModel");
 const { Product } = require("../model/productModel");
 
 exports.postProduct = async (req, res) => {

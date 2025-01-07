@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+</head>
+<body>
+    <body class="bg-gray-100 font-sans text-gray-800">
+        <div class="h-screen w-full flex flex-col items-center justify-center p-6">
+            <!-- Başarılı işaret için simge -->
+            <div class="border-2 p-8 border-green-700 rounded-full mb-5 bg-green-100">
+                <i class="fa-solid fa-check text-6xl text-green-700"></i>
+            </div>
+            
+            <!-- Başarı mesajı -->
+            <p class="text-xl font-semibold text-center mb-4">Ödemeniz işleminiz başarılı!</p>
+    
+            <!-- Anasayfaya dönme butonu -->
+            <a href="/" class="flex justify-between items-center gap-3 p-4 bg-green-700 text-white rounded-lg hover:bg-green-800 transition duration-200 ease-in-out">
+                <i class="fa-solid fa-angle-left text-xl"></i> Anasayfaya Dön
+            </a>
+        </div>
+</body>
+</html>

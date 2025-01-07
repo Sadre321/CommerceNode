@@ -52,6 +52,17 @@ exports.payment = async (req, res) => {
   }
 };
 
+exports.paymentList = async (req, res) => {
+    try{
+      const paymentIntents = await stripe.paymentIntents.list();
+      res.status(200).json(paymentIntents)
+    }catch(error){
+      console.error("Stripe API hatası:", error);
+      res.status(500).send("Bir hata oluştu.");
+    }
+};
+
+
 exports.removeCart = async (req, res) => {
   try {
     const orderId = req.params.id; // Silinecek siparişin ID'si

@@ -31,7 +31,10 @@
             <h1 class="text-gray-700 font-semibold text-md mb-4">
               Ürün Listesi
             </h1>
+
+            <!-- Ürün listesi kısmı -->
             <div class="overflow-hidden h-[500px]">
+              <% if (orders && orders.orders.length > 0) { %>
               <ul class="space-y-4 overflow-auto h-full px-4">
                 <% orders.orders.forEach(order => { %>
                 <li class="flex justify-between items-center border-b pb-2">
@@ -52,8 +55,28 @@
                 </li>
                 <% }) %>
               </ul>
+              <% } else { %>
+              <div
+                class="h-full w-full flex flex-col items-center justify-center"
+              >
+                <!-- Başarılı işaret için simge -->
+                <div
+                  class="border-2 p-8 border-gray-700 rounded-full mb-5 bg-gray-100"
+                >
+                  <i class="fa-solid fa-cart-shopping text-6xl text-gray-700"></i>
+                </div>
+
+                <!-- Başarı mesajı -->
+                <p class="text-xl font-semibold text-center mb-4">
+                  Sepetiniz bos
+                </p>
+              </div>
+              <% } %>
             </div>
           </div>
+
+          <!-- Başarı mesajı ve ödeme butonu -->
+          <% if (orders && orders.orders.length > 0) { %>
 
           <div>
             <hr />
@@ -67,10 +90,11 @@
                 class="p-2 text-white rounded-lg bg-[#f84525] hover:opacity-75"
                 id="payment"
               >
-                Odeme yap
+                Ödeme Yap
               </button>
             </div>
           </div>
+          <% } %>
         </div>
       </div>
     </div>

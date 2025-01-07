@@ -26,7 +26,7 @@ Projenin kodlarını bilgisayarınıza klonlamak için aşağıdaki komutu kulla
 bash
 Kodu kopyala
 git clone <repo-url>
-2. Gerekli Paketleri Yükleyin
+2. Gerekli Paketleri Yükleyingi
 Proje dizinine girdikten sonra, gerekli bağımlılıkları yüklemek için aşağıdaki komutu çalıştırın:
 
 bash

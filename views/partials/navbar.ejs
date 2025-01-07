@@ -67,14 +67,16 @@
           <i class="fa-solid fa-gear p-2"></i>
         </a>
       </li>
-      <li class="w-full flex justify-between items-center p-2 hover:bg-gray-200 cursor-pointer">
-        <form action="/auth/logout" method="POST" class="w-full">
-          <button type="submit" class="flex justify-between items-center w-full bg-transparent border-0 p-0">
-            <span>Çıkış Yap</span>
-            <i class="fa-solid fa-right-from-bracket p-2"></i>
-          </button>
-        </form>
-      </li>
+      <% if (user) { %>
+        <li class="w-full flex justify-between items-center p-2 hover:bg-gray-200 cursor-pointer">
+          <form action="/auth/logout" method="POST" class="w-full">
+            <button type="submit" class="flex justify-between items-center w-full bg-transparent border-0 p-0">
+              <span>Çıkış Yap</span>
+              <i class="fa-solid fa-right-from-bracket p-2"></i>
+            </button>
+          </form>
+        </li>
+      <% } %>
     </ul>
   </div>
 </div>

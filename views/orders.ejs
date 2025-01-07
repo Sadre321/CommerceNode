@@ -15,15 +15,34 @@
       .modal.show {
         transform: translateY(0);
       }
+      
+      /* Stripe ödeme verisini göstermek için stil */
+      .payment-intent {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background-color: #f9fafb;
+      }
+      .payment-intent .status {
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+      .payment-intent .amount {
+        color: green;
+        font-size: 1.1rem;
+      }
+      .payment-intent .currency {
+        font-style: italic;
+        font-size: 1rem;
+      }
     </style>
   </head>
   <body>
     <%- include('partials/navbar') %>
 
     <!-- Container -->
-    <div
-      class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8"
-    >
+    <div class="w-full flex bg-[#f8f4f3] h-[673px] overflow-hidden justify-center items-start gap-8">
       <!-- Left Container -->
       <div class="w-1/6 p-4 overflow-auto bg-white h-full rounded-lg shadow-md">
         <%- include('partials/userPanel') %>
@@ -31,65 +50,10 @@
 
       <!-- Right Container -->
       <div class="w-5/6 h-full p-4 bg-[#f8f4f3] overflow-hidden">
-        <div
-          class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative"
-        >
-          <div>
-            <h1 class="text-gray-700 font-semibold text-md mb-4">
-              Kisisel bilgiler
-            </h1>
-            <div class="px-2">
-              <form action="/auth/save">
-                <div class="mb-2">
-                  <p class="ml-2 font-medium text-sm text-gray-700">
-                    E-posta Adresi
-                  </p>
-                  <label
-                    class="block font-medium text-sm text-gray-700"
-                    for="email"
-                  ></label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value="<%= user.email %>"
-                    disabled
-                    class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525] cursor-not-allowed"
-                  />
-                </div>
-                <div class="mb-2">
-                  <p class="ml-2 font-medium text-sm text-gray-700">
-                    Kullanıcı Adı
-                  </p>
-                  <label
-                    class="block font-medium text-sm text-gray-700"
-                    for="username"
-                  ></label>
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="Kullanıcı Adı"
-                    value="<%= user.name %>"
-                    class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]"
-                  />
-                </div>
-                <div class="mb-2">
-                  <p class="ml-2 font-medium text-sm text-gray-700">Şifre</p>
-                  <label
-                    class="block font-medium text-sm text-gray-700"
-                    for="password"
-                  ></label>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Şifre"
-                    class="w-full rounded-md py-2.5 px-4 border text-sm outline-[#f84525]"
-                  />
-                </div>
-              </form>
-              
-            </div>
-
+        <div class="flex flex-col gap-5 h-full shadow-md overflow-auto rounded-lg bg-white p-4 relative">
+          <!-- Veriler buraya yüklenecek -->
+          <div id="paymentDataContainer">
+            <!-- Fetch edilen veri buraya yerleştirilecek -->
           </div>
         </div>
       </div>
@@ -97,5 +61,61 @@
 
     <%- include('partials/footer') %>
 
+    <script>
+      // Sayfa yüklendiğinde veri çekme işlemi
+      const fetchData = async () => {
+        try {
+          // loading göstergesi aktif edilmelidir, örneğin:
+          // setLoading(true); (Yükleme göstergesi eklenebilir)
+
+          // API çağrısı
+          const response = await fetch(`http://localhost:3000/auth/payment-intents`, {
+            method: "GET",
+          });
+
+          // API yanıtını kontrol et
+          if (response.ok) {
+            const { data } = await response.json();
+            console.log(data);
+
+            // Veriyi işleyip sayfada göstermek için işleme
+            const container = document.getElementById('paymentDataContainer');
+
+            // Eğer veri varsa, her bir payment intent'i işleyip göstermek
+            if (data && Array.isArray(data)) {
+              data.forEach(intent => {
+                const { amount, currency, status, created } = intent;
+
+                // Ödeme intentinin bilgilerini biçimlendirerek ekliyoruz
+                const intentElement = document.createElement('div');
+                intentElement.classList.add('payment-intent');
+                
+                intentElement.innerHTML = `
+                  <div class="status">Durum: ${status}</div>
+                  <div class="amount">Tutar: ${amount / 100} ${currency.toUpperCase()}</div>
+                  <div class="currency">Para Birimi: ${currency.toUpperCase()}</div>
+                  <div class="created">Oluşturulma Tarihi: ${new Date(created * 1000).toLocaleString()}</div>
+                `;
+                
+                container.appendChild(intentElement);
+              });
+            } else {
+              container.innerHTML = '<p>No payment intents found.</p>';
+            }
+          } else {
+            console.log("Giriş yaparken bir hata oluştu");
+            alert("Bir hata oluştu, lütfen tekrar deneyin.");
+          }
+        } catch (error) {
+          console.log("Giriş hatası:", error);
+          alert("Bir hata oluştu, lütfen tekrar deneyin.");
+        }
+      };
+
+      // Sayfa yüklendiğinde fetchData fonksiyonunu çalıştır
+      window.onload = () => {
+        fetchData(); // Sayfa yüklendiğinde veri çekme işlemini başlat
+      };
+    </script>
   </body>
 </html>
